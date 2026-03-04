@@ -1,0 +1,29 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # 每 6 小时检查一次上游
+  workflow_dispatch: {}     # 允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/15dd/hikari_novel_flutter.git
+          git fetch upstream
+
+      - name: Merge upstream changes
+        run: |
+          git merge upstream/main --no-edit || true
+
+      - name: Push changes
+        run: |
+          git push origin main
